@@ -1,0 +1,291 @@
+#!/usr/bin/env bash
+
+# close any open System Preferences panes, to prevent them from overriding
+# settings we’re about to change
+osascript -e 'tell application "System Preferences" to quit'
+
+# ask for the administrator password upfront
+sudo -v
+
+# keep-alive: update existing `sudo` time stamp until `.macos` has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+# ----------------------------------------------------------------------------------------------------
+
+# ** START: General **
+
+# increase window resize speed for Cocoa applications
+defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
+
+# automatic capitalization as it’s annoying when typing code
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+
+# mart dashes as they’re annoying when typing code
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+
+# automatic period substitution as it’s annoying when typing code
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+
+# smart quotes as they’re annoying when typing code
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+
+# auto-correct
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+
+# ** END: General **
+
+# ----------------------------------------------------------------------------------------------------
+
+# ** START: Finder **
+
+# new windows show Desktop
+defaults write com.apple.finder NewWindowTarget -string "PfDe"
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Desktop/"
+
+# disable window animations and Get Info animations
+defaults write com.apple.finder DisableAllAnimations -bool true
+
+# show all filename extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+# show status bar
+defaults write com.apple.finder ShowStatusBar -bool true
+
+# show path bar
+defaults write com.apple.finder ShowPathbar -bool true
+
+# keep folders on top when sorting by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+# when performing a search, search the current folder by default
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+# disable the warning when changing a file extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+
+# use list view in all Finder windows by default
+# four-letter codes for the other view modes: `icnv`, `clmv`, `glyv`
+defaults write com.apple.finder FXPreferredViewStyle -string "clmv"
+
+# disable the warning before emptying the Trash
+defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
+# hide Recent Tags in sidebar
+defaults write com.apple.finder ShowRecentTags -bool false
+
+echo ""
+echo "Manual Finder sidebar setup:"
+echo "Finder → Settings → Sidebar"
+echo "Enable: Applications, Desktop, Documents, Downloads, Cloud Storage, External disks, CDs/DVDs/iOS Devices, Bonjour computers, Connected servers"
+echo "Disable: Recents, Shared, Movies, Music, Pictures, iCloud Drive, Home folder, Computer, AirDrop, Trash, Recent Tags"
+echo "In Finder → Drag all items to Favorites section"
+
+echo ""
+echo "Manual Finder toolbar setup:"
+echo "Finder → View → Customize Toolbar…"
+echo "Drag AirDrop to the first icon position from left to right"
+
+# ** END: Finder **
+
+# ----------------------------------------------------------------------------------------------------
+
+# ** START: Trackpad **
+
+# tap to click
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
+# secondary click: bottom-right corner
+defaults write com.apple.AppleMultitouchTrackpad TrackpadCornerSecondaryClick -int 2
+defaults write com.apple.AppleMultitouchTrackpad TrackpadRightClick -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
+defaults -currentHost write NSGlobalDomain com.apple.trackpad.trackpadCornerClickBehavior -int 1
+defaults -currentHost write NSGlobalDomain com.apple.trackpad.enableSecondaryClick -bool true
+
+# ** END: trackpad, mouse, keyboard, bluetooth accessories, and input **
+
+# ----------------------------------------------------------------------------------------------------
+
+# ** START: Lock Screen **
+
+# turn display off on battery when inactive - 2 hours
+sudo pmset -b displaysleep 120
+
+# turn display off on power adapter when inactive - never
+sudo pmset -c displaysleep 0
+
+# require password after screen saver begins or display is turned off - Immediately
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+
+# ** END: Lock Screen **
+
+# ----------------------------------------------------------------------------------------------------
+
+# ** START: Display **
+
+# reduce transparency
+defaults write com.apple.universalaccess reduceTransparency -bool true
+
+# reduce motion
+defaults write com.apple.universalaccess reduceMotion -bool true
+
+# ** END: Display **
+
+# ----------------------------------------------------------------------------------------------------
+
+# ** START: Desktop & Dock **
+
+# set the icon size of Dock items to 48 pixels
+defaults write com.apple.dock tilesize -int 48
+
+# change minimize/maximize window effect
+defaults write com.apple.dock mineffect -string "scale"
+
+# minimize windows into their application’s icon
+defaults write com.apple.dock minimize-to-application -bool false
+
+# automatically hide and show the Dock
+defaults write com.apple.dock autohide -bool true
+
+# remove the auto-hiding Dock delay
+defaults write com.apple.dock autohide-delay -float 0
+
+# show the dock faster when moving the cursor to the bottom of the screen 
+defaults write com.apple.dock autohide-time-modifier -float 0
+
+# make Dock icons of hidden applications translucent
+defaults write com.apple.dock showhidden -bool true
+
+# animate opening applications from the Dock
+defaults write com.apple.dock launchanim -bool false
+
+# show recent applications in Dock
+defaults write com.apple.dock show-recents -bool false
+
+# ** END: Desktop & Dock **
+
+# ----------------------------------------------------------------------------------------------------
+
+# ** START: Mission Control **
+
+# speed up Mission Control animations
+defaults write com.apple.dock expose-animation-duration -float 0.1
+
+# automatically rearrange Spaces based on most recent use
+defaults write com.apple.dock mru-spaces -bool false
+
+# when switching to an application, switch to a Space with open windows for the application
+defaults write NSGlobalDomain AppleSpacesSwitchOnActivate -bool false
+
+# group windows by application
+defaults write com.apple.dock expose-group-apps -bool false
+
+# displays have separate Spaces
+defaults write com.apple.spaces spans-displays -bool false
+
+# drag windows to top of screen to enter Mission Control
+defaults write com.apple.dock EnableTopTilingByEdgeDrag -bool false
+
+# disable all hot corners
+defaults write com.apple.dock wvous-tl-corner -int 0
+defaults write com.apple.dock wvous-tl-modifier -int 0
+
+defaults write com.apple.dock wvous-tr-corner -int 0
+defaults write com.apple.dock wvous-tr-modifier -int 0
+
+defaults write com.apple.dock wvous-bl-corner -int 0
+defaults write com.apple.dock wvous-bl-modifier -int 0
+
+defaults write com.apple.dock wvous-br-corner -int 0
+defaults write com.apple.dock wvous-br-modifier -int 0
+
+# ** END: Mission Control **
+
+# ----------------------------------------------------------------------------------------------------
+
+# ** START: Keyboard Shortcuts **
+
+# disable keyboard shortcut: toggle Dock hiding
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 52 "{ enabled = 0; value = { parameters = (100, 2, 1572864); type = standard; }; }"
+
+# mission control
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 32 "{ enabled = 1; value = { parameters = (126, 126, 1048576); type = standard; }; }"
+
+# show notification center
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 163 "{ enabled = 0; value = { parameters = (65535, 65535, 0); type = standard; }; }"
+
+# turn do not disturb on/off
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 175 "{ enabled = 1; value = { parameters = (65535, 65535, 0); type = standard; }; }"
+
+# application windows
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 33 "{ enabled = 1; value = { parameters = (125, 125, 262144); type = standard; }; }"
+
+# show desktop
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 36 "{ enabled = 1; value = { parameters = (103, 103, 0); type = standard; }; }"
+
+# turn stage manager on/off
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 184 "{ enabled = 1; value = { parameters = (65535, 65535, 0); type = standard; }; }"
+
+# move left a space
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 79 "{ enabled = 1; value = { parameters = (123, 123, 1048576); type = standard; }; }"
+
+# move right a space
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 81 "{ enabled = 1; value = { parameters = (124, 124, 1048576); type = standard; }; }"
+
+# switch to desktop 1
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 118 "{ enabled = 1; value = { parameters = (49, 18, 524288); type = standard; }; }"
+
+# switch to desktop 2
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 119 "{ enabled = 1; value = { parameters = (50, 19, 524288); type = standard; }; }"
+
+# switch to desktop 3
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 120 "{ enabled = 1; value = { parameters = (51, 20, 524288); type = standard; }; }"
+
+# switch to desktop 4
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 121 "{ enabled = 1; value = { parameters = (52, 21, 524288); type = standard; }; }"
+
+# switch to desktop 5
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 122 "{ enabled = 1; value = { parameters = (53, 23, 524288); type = standard; }; }"
+
+# switch to desktop 6
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 123 "{ enabled = 1; value = { parameters = (54, 22, 524288); type = standard; }; }"
+
+# switch to desktop 7
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 124 "{ enabled = 1; value = { parameters = (55, 26, 524288); type = standard; }; }"
+
+# switch to desktop 8
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 125 "{ enabled = 1; value = { parameters = (56, 28, 524288); type = standard; }; }"
+
+# switch to desktop 9
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 126 "{ enabled = 1; value = { parameters = (57, 25, 524288); type = standard; }; }"
+
+# quick note
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 190 "{ enabled = 0; value = { parameters = (113, 12, 8388608); type = standard; }; }"
+
+# game overlay
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 200 "{ enabled = 0; value = { parameters = (65535, 65535, 0); type = standard; }; }"
+
+# spotlight search
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "{ enabled = 1; value = { parameters = (32, 49, 1179648); type = standard; }; }"
+
+# finder search window
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 "{ enabled = 0; value = { parameters = (32, 49, 1703936); type = standard; }; }"
+
+# use F1, F2, etc. keys as standard function keys
+defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
+
+# ** END: Keyboard Shortcuts **
+
+# ----------------------------------------------------------------------------------------------------
+
+# kill affected applications
+
+for app in "Dock" "Finder" "SystemUIServer"; do
+  killall "$app" &> /dev/null || true
+done
+
+echo "Done. Note that some of these changes require a logout/restart to take effect."

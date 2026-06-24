@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+FIREFOX_DIR="$HOME/Library/Application Support/Firefox/Profiles"
+
+mkdir -p "$FIREFOX_DIR"
+
+find "$FIREFOX_DIR" -maxdepth 1 -type d -name "*.default*" | while read -r profile; do
+  cat > "$profile/user.js" <<'EOF'
+user_pref("full-screen-api.macos-native-full-screen", false);
+EOF
+done
+
+echo "Manual step required:"
+echo "Applications → Firefox → Get Info → Disable 'Scale to fit below built-in camera'"

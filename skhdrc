@@ -1,0 +1,63 @@
+# https://github.com/asmvik/skhd
+
+# -- change window focus within space --
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - h : yabai -m window --focus west
+alt - l : yabai -m window --focus east
+
+# -- modify the layout --
+# rotate layout clockwise
+alt + shift - r : yabai -m space --rotate 270
+# flip along y-axis
+alt + shift - y : yabai -m space --mirror y-axis
+# flip along x-axis
+# alt + shift - x : yabai -m space --mirror x-axis
+# toggle window float
+alt + shift - t : yabai -m window --toggle float --grid 4:4:1:1:2:2
+
+# -- modify windows size --
+# maximize a window
+alt + shift - m : yabai -m window --toggle native-fullscreen
+# balance out tree of windows (resize to occupy same area)
+alt + shift - e : yabai -m space --balance
+
+alt + shift - a : yabai -m window --resize left:-40:0 ; yabai -m window --resize right:-40:0
+alt + shift - d : yabai -m window --resize left:40:0 ; yabai -m window --resize right:40:0
+
+# -- swap windows --
+alt + shift - j : yabai -m window --swap south
+alt + shift - k : yabai -m window --swap north
+alt + shift - h : yabai -m window --swap west
+alt + shift - l : yabai -m window --swap east
+
+# -- move window to prev and next space --
+alt + shift - p : yabai -m window --space prev; yabai -m space --focus prev; yabai -m window --toggle float off
+alt + shift - n : yabai -m window --space next; yabai -m space --focus next; yabai -m window --toggle float off
+# move window to space #
+alt + shift - 1 : yabai -m window --space 1;
+alt + shift - 2 : yabai -m window --space 2;
+alt + shift - 3 : yabai -m window --space 3;
+alt + shift - 4 : yabai -m window --space 4;
+alt + shift - 5 : yabai -m window --space 5;
+alt + shift - 6 : yabai -m window --space 6;
+alt + shift - 7 : yabai -m window --space 7;
+alt + shift - 8 : yabai -m window --space 8;
+alt + shift - 9 : yabai -m window --space 9;
+
+# -- close window --
+alt + shift - x : yabai -m window --close; sleep 0.15; yabai -m window --focus first
+
+# -- kill app --
+alt + shift - q : yabai -m query --windows --window | jq -r '.pid' | xargs kill
+
+# -- stop, start, restart yabai --
+ctrl + alt - q : yabai --stop-service
+ctrl + alt - s : yabai --start-service
+ctrl + alt - r : yabai --restart-service
+
+# -- apps shortcuts --
+alt - b : open -a "Firefox" --new
+# alt + shift - return : open -a "Ghostty"; sleep 0.1; osascript -e 'tell application "System Events" to keystroke "n" using command down'
+
+alt + shift - return : pgrep -x ghostty >/dev/null && osascript -e 'tell application "Ghostty" to activate' -e 'delay 0.1' -e 'tell application "System Events" to keystroke "n" using command down' || open -a "Ghostty"
