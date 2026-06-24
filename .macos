@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-# close any open System Preferences panes, to prevent them from overriding
-# settings we’re about to change
-osascript -e 'tell application "System Preferences" to quit'
+# close System Settings so it cannot overwrite changes with cached preferences
+osascript -e 'tell application "System Settings" to quit' 2>/dev/null || true
 
 # ask for the administrator password upfront
 sudo -v
@@ -127,11 +126,23 @@ defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 # ** START: Display **
 
+accessibility_settings_failed=0
+
 # reduce transparency
-defaults write com.apple.universalaccess reduceTransparency -bool true
+defaults write com.apple.universalaccess reduceTransparency -bool true \
+  2>/dev/null || accessibility_settings_failed=1
 
 # reduce motion
-defaults write com.apple.universalaccess reduceMotion -bool true
+defaults write com.apple.universalaccess reduceMotion -bool true \
+  2>/dev/null || accessibility_settings_failed=1
+
+if ((accessibility_settings_failed)); then
+  printf '%s\n' \
+    '' \
+    'Manual Accessibility display setup:' \
+    'System Settings → Accessibility → Display → Enable Reduce transparency' \
+    'System Settings → Accessibility → Motion → Enable Reduce motion'
+fi
 
 # ** END: Display **
 
@@ -277,6 +288,14 @@ defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 "{ en
 
 # use F1, F2, etc. keys as standard function keys
 defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
+
+# apply the symbolic hotkeys to the current login session
+activate_settings="/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings"
+if [[ -x "$activate_settings" ]] && "$activate_settings" -u; then
+  :
+else
+  printf 'Warning: Could not activate keyboard shortcuts until the next login.\n' >&2
+fi
 
 # ** END: Keyboard Shortcuts **
 
