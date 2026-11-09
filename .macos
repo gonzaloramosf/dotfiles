@@ -47,6 +47,9 @@ defaults write com.apple.finder DisableAllAnimations -bool true
 # show all filename extensions
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
+# hide items from the Desktop while keeping them accessible in Finder
+defaults write com.apple.finder CreateDesktop -bool false
+
 # show status bar
 defaults write com.apple.finder ShowStatusBar -bool true
 
@@ -220,71 +223,80 @@ defaults write com.apple.dock wvous-br-modifier -int 0
 
 # ** START: Keyboard Shortcuts **
 
+# Load the shortcut helper relative to this script, regardless of the working directory.
+source "$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/macos/keyboard-shortcuts.sh"
+
 # disable keyboard shortcut: toggle Dock hiding
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 52 "{ enabled = 0; value = { parameters = (100, 2, 1572864); type = standard; }; }"
+set_symbolic_hotkey 52 false 100 2 \
+  "$((MODIFIER_OPTION + MODIFIER_COMMAND))"
 
 # mission control
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 32 "{ enabled = 1; value = { parameters = (126, 126, 1048576); type = standard; }; }"
+set_symbolic_hotkey 32 true 65535 126 \
+  "$((MODIFIER_COMMAND + MODIFIER_FUNCTION))"
 
 # show notification center
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 163 "{ enabled = 0; value = { parameters = (65535, 65535, 0); type = standard; }; }"
+set_symbolic_hotkey 163 false 65535 65535 0
 
 # turn do not disturb on/off
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 175 "{ enabled = 1; value = { parameters = (65535, 65535, 0); type = standard; }; }"
+set_symbolic_hotkey 175 true 65535 65535 0
 
 # application windows
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 33 "{ enabled = 1; value = { parameters = (125, 125, 262144); type = standard; }; }"
+set_symbolic_hotkey 33 true 65535 125 \
+  "$((MODIFIER_CONTROL + MODIFIER_FUNCTION))"
 
 # show desktop
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 36 "{ enabled = 1; value = { parameters = (103, 103, 0); type = standard; }; }"
+set_symbolic_hotkey 36 true 65535 103 0
 
 # turn stage manager on/off
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 184 "{ enabled = 1; value = { parameters = (65535, 65535, 0); type = standard; }; }"
+set_symbolic_hotkey 184 true 65535 65535 0
 
 # move left a space
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 79 "{ enabled = 1; value = { parameters = (123, 123, 1048576); type = standard; }; }"
+set_symbolic_hotkey 79 true 65535 123 \
+  "$((MODIFIER_COMMAND + MODIFIER_FUNCTION))"
 
 # move right a space
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 81 "{ enabled = 1; value = { parameters = (124, 124, 1048576); type = standard; }; }"
+set_symbolic_hotkey 81 true 65535 124 \
+  "$((MODIFIER_COMMAND + MODIFIER_FUNCTION))"
 
 # switch to desktop 1
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 118 "{ enabled = 1; value = { parameters = (49, 18, 524288); type = standard; }; }"
+set_symbolic_hotkey 118 true 49 18 "$MODIFIER_OPTION"
 
 # switch to desktop 2
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 119 "{ enabled = 1; value = { parameters = (50, 19, 524288); type = standard; }; }"
+set_symbolic_hotkey 119 true 50 19 "$MODIFIER_OPTION"
 
 # switch to desktop 3
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 120 "{ enabled = 1; value = { parameters = (51, 20, 524288); type = standard; }; }"
+set_symbolic_hotkey 120 true 51 20 "$MODIFIER_OPTION"
 
 # switch to desktop 4
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 121 "{ enabled = 1; value = { parameters = (52, 21, 524288); type = standard; }; }"
+set_symbolic_hotkey 121 true 52 21 "$MODIFIER_OPTION"
 
 # switch to desktop 5
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 122 "{ enabled = 1; value = { parameters = (53, 23, 524288); type = standard; }; }"
+set_symbolic_hotkey 122 true 53 23 "$MODIFIER_OPTION"
 
 # switch to desktop 6
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 123 "{ enabled = 1; value = { parameters = (54, 22, 524288); type = standard; }; }"
+set_symbolic_hotkey 123 true 54 22 "$MODIFIER_OPTION"
 
 # switch to desktop 7
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 124 "{ enabled = 1; value = { parameters = (55, 26, 524288); type = standard; }; }"
+set_symbolic_hotkey 124 true 55 26 "$MODIFIER_OPTION"
 
 # switch to desktop 8
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 125 "{ enabled = 1; value = { parameters = (56, 28, 524288); type = standard; }; }"
+set_symbolic_hotkey 125 true 56 28 "$MODIFIER_OPTION"
 
 # switch to desktop 9
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 126 "{ enabled = 1; value = { parameters = (57, 25, 524288); type = standard; }; }"
+set_symbolic_hotkey 126 true 57 25 "$MODIFIER_OPTION"
 
 # quick note
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 190 "{ enabled = 0; value = { parameters = (113, 12, 8388608); type = standard; }; }"
+set_symbolic_hotkey 190 false 113 12 "$MODIFIER_FUNCTION"
 
 # game overlay
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 200 "{ enabled = 0; value = { parameters = (65535, 65535, 0); type = standard; }; }"
+set_symbolic_hotkey 200 false 65535 65535 0
 
 # spotlight search
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 64 "{ enabled = 1; value = { parameters = (32, 49, 1179648); type = standard; }; }"
+set_symbolic_hotkey 64 true 32 49 "$MODIFIER_COMMAND"
 
 # finder search window
-defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 65 "{ enabled = 0; value = { parameters = (32, 49, 1703936); type = standard; }; }"
+set_symbolic_hotkey 65 false 32 49 \
+  "$((MODIFIER_OPTION + MODIFIER_COMMAND))"
 
 # use F1, F2, etc. keys as standard function keys
 defaults write NSGlobalDomain com.apple.keyboard.fnState -bool true
