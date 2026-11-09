@@ -8,8 +8,42 @@ mkdir -p "$FIREFOX_DIR"
 find "$FIREFOX_DIR" -maxdepth 1 -type d -name "*.default*" | while read -r profile; do
   cat > "$profile/user.js" <<'EOF'
 user_pref("full-screen-api.macos-native-full-screen", false);
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 EOF
+
+  mkdir -p "$profile/chrome"
+  cat > "$profile/chrome/dotfiles-ui.css" <<'CSS'
+@-moz-document url("chrome://browser/content/browser.xhtml") {
+  /* Sidebar tools, including history, extensions, and the settings gear. */
+  .buttons-wrapper:has(> .tools-and-extensions),
+  #sidebar-tools-and-extensions-splitter {
+    display: none !important;
+  }
+
+  /* Pinned extensions, the extensions menu, and built-in Firefox VPN. */
+  #nav-bar .unified-extensions-item,
+  #nav-bar .webextension-browser-action,
+  #nav-bar #unified-extensions-button,
+  #nav-bar #ipprotection-button {
+    display: none !important;
+  }
+}
+CSS
+
+  # Imports must precede existing CSS rules. Preserve user customizations.
+  user_chrome="$profile/chrome/userChrome.css"
+  import_rule='@import url("dotfiles-ui.css");'
+  if ! grep -Fqx "$import_rule" "$user_chrome" 2>/dev/null; then
+    tmp_css=$(mktemp "$profile/chrome/userChrome.css.XXXXXX")
+    printf '%s\n' "$import_rule" > "$tmp_css"
+    if [ -f "$user_chrome" ]; then
+      cat "$user_chrome" >> "$tmp_css"
+    fi
+    mv "$tmp_css" "$user_chrome"
+  fi
 done
 
+echo "Firefox UI settings apply after restarting Firefox."
+echo "For a fresh install, launch Firefox once, quit it, then rerun this script."
 echo "Manual step required:"
 echo "Applications → Firefox → Get Info → Disable 'Scale to fit below built-in camera'"
