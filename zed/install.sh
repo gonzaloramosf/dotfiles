@@ -65,6 +65,19 @@ else
   printf 'Installed Zed settings.\n'
 fi
 
+# Install panel shortcut overrides alongside settings.
+ZED_KEYMAP_SOURCE="$ZED_SCRIPT_DIR/keymap.json"
+ZED_KEYMAP_TARGET="$HOME/.config/zed/keymap.json"
+if ! cmp -s "$ZED_KEYMAP_SOURCE" "$ZED_KEYMAP_TARGET"; then
+  if [[ -e "$ZED_KEYMAP_TARGET" || -L "$ZED_KEYMAP_TARGET" ]]; then
+    ZED_KEYMAP_BACKUP="${ZED_KEYMAP_TARGET}.backup-$(date +%Y%m%d-%H%M%S)-$$"
+    mv "$ZED_KEYMAP_TARGET" "$ZED_KEYMAP_BACKUP"
+    printf 'Backed up existing keymap to %s\n' "$ZED_KEYMAP_BACKUP"
+  fi
+  install -m 600 "$ZED_KEYMAP_SOURCE" "$ZED_KEYMAP_TARGET"
+  printf 'Installed Zed keymap.\n'
+fi
+
 if open -a Zed; then
   printf 'Zed is ready. It will install JetBrains Icons from the extension gallery.\n'
 else

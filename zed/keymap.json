@@ -1,0 +1,13 @@
+[
+  {
+    "context": "GitPanel",
+    "bindings": {
+      "cmd-1": "project_panel::ToggleFocus"
+    }
+  },
+  {
+    "bindings": {
+      "cmd-`": "terminal_panel::Toggle"
+    }
+  }
+]

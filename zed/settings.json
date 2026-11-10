@@ -1,10 +1,15 @@
 {
   "project_panel": {
-    "dock": "left"
+    "dock": "left",
+    "default_width": 360
   },
   "diff_view_style": "split",
   "disable_ai": true,
   "title_bar": {
+    "show_menus": false,
+    "show_user_picture": false,
+    "show_user_menu": false,
+    "show_onboarding_banner": false,
     "show_sign_in": false
   },
   "agent": {
@@ -41,5 +46,53 @@
     "mode": "dark",
     "light": "Ayu Light",
     "dark": "One Dark",
+  },
+  "toolbar": {
+    "breadcrumbs": false,
+    "quick_actions": false,
+    "selections_menu": false,
+    "agent_review": false,
+    "code_actions": false
+  },
+  "tabs": {
+    "show_close_button": "hidden",
+    "file_icons": false,
+    "git_status": true
+  },
+  "format_on_save": "on",
+  "auto_update": false,
+  "global_lsp_settings": {
+    "button": false
+  },
+  "outline_panel": {
+    "button": false
+  },
+  "search": {
+    "button": false
+  },
+  "diagnostics": {
+    "button": false
+  },
+  "status_bar": {
+    "line_endings_button": false
+  },
+  "tab_bar": {
+    "show_nav_history_buttons": false,
+    "show_tab_bar_buttons": false
+  },
+  "git": {
+    "inline_blame": {
+      "location": "status_bar",
+      "show_commit_summary": true
+    }
+  },
+  "show_whitespaces": "selection",
+  "drag_and_drop_selection": {
+    "enabled": false
+  },
+  "excerpt_context_lines": 1000,
+  "git_panel": {
+    "dock": "left",
+    "default_width": 360
   },
 }
