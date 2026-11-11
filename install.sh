@@ -2,7 +2,6 @@
 set -euo pipefail
 
 DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-BACKUP_TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
 FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip"
 
 info() {
@@ -33,23 +32,12 @@ install_file() {
   fi
 
   if [[ -e "$target" || -L "$target" ]]; then
-    local backup="${target}.backup-${BACKUP_TIMESTAMP}"
-    mv "$target" "$backup"
-    printf 'Backed up %s to %s\n' "$target" "$backup"
+    # Replace the destination itself, including symlinks.
+    rm -f -- "$target"
   fi
 
   cp "$source" "$target"
   printf 'Installed %s\n' "$target"
-}
-
-archive_legacy_file() {
-  local target="$1"
-
-  if [[ -e "$target" || -L "$target" ]]; then
-    local backup="${target}.backup-${BACKUP_TIMESTAMP}"
-    mv "$target" "$backup"
-    printf 'Archived legacy config %s to %s\n' "$target" "$backup"
-  fi
 }
 
 load_homebrew() {
@@ -156,20 +144,14 @@ install_zsh_config() {
 install_ghostty_config() {
   install_file "$DOTFILES_DIR/config.ghostty" \
     "$HOME/.config/ghostty/config.ghostty"
-  archive_legacy_file \
-    "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
-  archive_legacy_file \
-    "$HOME/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
 }
 
 install_skhd_config() {
   install_file "$DOTFILES_DIR/skhdrc" "$HOME/.config/skhd/skhdrc"
-  archive_legacy_file "$HOME/.skhdrc"
 }
 
 install_yabai_config() {
   install_file "$DOTFILES_DIR/yabairc" "$HOME/.config/yabai/yabairc"
-  archive_legacy_file "$HOME/.yabairc"
 }
 
 apply_macos_settings() {

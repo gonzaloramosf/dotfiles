@@ -49,34 +49,26 @@ else
   "$ZED_BREW_BIN" install --cask font-jetbrains-mono-nerd-font
 fi
 
-mkdir -p "$(dirname -- "$ZED_SETTINGS_TARGET")"
-if [[ -e "$ZED_SETTINGS_TARGET" || -L "$ZED_SETTINGS_TARGET" ]]; then
-  if cmp -s "$ZED_SETTINGS_SOURCE" "$ZED_SETTINGS_TARGET"; then
-    printf 'Zed settings are already up to date.\n'
-  else
-    ZED_SETTINGS_BACKUP="${ZED_SETTINGS_TARGET}.backup-$(date +%Y%m%d-%H%M%S)-$$"
-    mv "$ZED_SETTINGS_TARGET" "$ZED_SETTINGS_BACKUP"
-    printf 'Backed up existing settings to %s\n' "$ZED_SETTINGS_BACKUP"
-    install -m 600 "$ZED_SETTINGS_SOURCE" "$ZED_SETTINGS_TARGET"
-    printf 'Installed Zed settings.\n'
-  fi
-else
-  install -m 600 "$ZED_SETTINGS_SOURCE" "$ZED_SETTINGS_TARGET"
-  printf 'Installed Zed settings.\n'
-fi
+install_config_file() {
+  local source="$1"
+  local target="$2"
 
-# Install panel shortcut overrides alongside settings.
-ZED_KEYMAP_SOURCE="$ZED_SCRIPT_DIR/keymap.json"
-ZED_KEYMAP_TARGET="$HOME/.config/zed/keymap.json"
-if ! cmp -s "$ZED_KEYMAP_SOURCE" "$ZED_KEYMAP_TARGET"; then
-  if [[ -e "$ZED_KEYMAP_TARGET" || -L "$ZED_KEYMAP_TARGET" ]]; then
-    ZED_KEYMAP_BACKUP="${ZED_KEYMAP_TARGET}.backup-$(date +%Y%m%d-%H%M%S)-$$"
-    mv "$ZED_KEYMAP_TARGET" "$ZED_KEYMAP_BACKUP"
-    printf 'Backed up existing keymap to %s\n' "$ZED_KEYMAP_BACKUP"
+  mkdir -p "$(dirname -- "$target")"
+  if [[ -f "$target" && ! -L "$target" ]] && cmp -s "$source" "$target"; then
+    printf 'Already up to date: %s\n' "$target"
+    return
   fi
-  install -m 600 "$ZED_KEYMAP_SOURCE" "$ZED_KEYMAP_TARGET"
-  printf 'Installed Zed keymap.\n'
-fi
+
+  # Replace symlinks themselves rather than writing through to their targets.
+  if [[ -e "$target" || -L "$target" ]]; then
+    rm -f -- "$target"
+  fi
+  install -m 600 "$source" "$target"
+  printf 'Installed %s\n' "$target"
+}
+
+install_config_file "$ZED_SETTINGS_SOURCE" "$ZED_SETTINGS_TARGET"
+install_config_file "$ZED_SCRIPT_DIR/keymap.json" "$HOME/.config/zed/keymap.json"
 
 if open -a Zed; then
   printf 'Zed is ready. It will install JetBrains Icons from the extension gallery.\n'

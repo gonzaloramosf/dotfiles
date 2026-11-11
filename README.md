@@ -12,18 +12,6 @@ The installer:
 - installs and loads the `no-sleep-speaker` LaunchAgent; and
 - starts yabai and skhd.
 
-The Zsh configuration is vanilla and does not install or load Oh My Zsh,
-Powerlevel10k, or third-party Zsh plugins.
-
-## Requirements
-
-- macOS
-- an internet connection
-- an administrator account
-
-The script may request the administrator password for Homebrew and macOS system
-settings. Homebrew may also request installation of Apple's command-line tools.
-
 ## Install
 
 Clone the repository, enter it, and run:
@@ -58,11 +46,8 @@ Configuration files are copied to these locations:
 ~/.config/yabai/yabairc
 ```
 
-The script can be run again safely. Files with matching content are left alone.
-When a destination contains different content or a symbolic link, it is renamed
-with a timestamp such as `.zshrc.backup-20260623-120000` before the repository
-file is copied. Legacy Ghostty, skhd, and yabai configuration locations are also
-archived so they cannot override the files under `~/.config`.
+Running the installer replaces destination configuration files with the repository
+versions without creating backups.
 
 After installation, open a new terminal. Log out or restart macOS for settings
 that do not take effect immediately.
@@ -77,7 +62,3 @@ System Settings → Privacy & Security → Accessibility
 
 Enable yabai and skhd there. Depending on the macOS version and the yabai
 features you use, yabai may require additional security configuration.
-
-The Firefox script prints its remaining manual display-setting step when it
-runs. Finder also prints the sidebar and toolbar steps that cannot be reliably
-automated.
