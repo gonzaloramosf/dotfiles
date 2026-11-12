@@ -77,13 +77,13 @@ install_no_sleep_speaker() {
 }
 
 start_window_services() {
-  if command -v yabai >/dev/null 2>&1; then
+  if [[ "${1:-all}" == all || "${1:-all}" == yabai ]] && command -v yabai >/dev/null 2>&1; then
     yabai --start-service >/dev/null 2>&1 \
       || yabai --restart-service >/dev/null 2>&1 \
       || warn "yabai could not start; check its macOS permissions."
   fi
 
-  if command -v skhd >/dev/null 2>&1; then
+  if [[ "${1:-all}" == all || "${1:-all}" == skhd ]] && command -v skhd >/dev/null 2>&1; then
     skhd --start-service >/dev/null 2>&1 \
       || skhd --restart-service >/dev/null 2>&1 \
       || warn "skhd could not start; check its macOS permissions."
@@ -124,20 +124,67 @@ if [[ "$(uname -s)" != Darwin ]]; then
   exit 1
 fi
 
-# Installation tasks ---------------------------------------------------------
-# Comment out any one line below to skip that task.
+# Validate every requested component
+for component in "$@"; do
+  case "$component" in
+    homebrew|jetbrains-font|zed|zsh|ghostty|skhd|yabai|no-sleep-speaker|macos-settings|firefox-settings) ;;
+    *)
+      printf 'Unknown installation component: %s\n' "$component" >&2
+      exit 1
+      ;;
+  esac
+done
 
-run_step "Installing Homebrew packages and applications" install_homebrew_packages
-run_step "Installing JetBrainsMono Nerd Font" install_font
-run_step "Installing Zed and its configuration" install_zed
-run_step "Installing Zsh configuration" install_zsh_config
-run_step "Installing Ghostty configuration" install_ghostty_config
-run_step "Installing skhd configuration" install_skhd_config
-run_step "Installing yabai configuration" install_yabai_config
-run_step "Installing the no-sleep-speaker LaunchAgent" install_no_sleep_speaker
-run_step "Applying macOS settings" apply_macos_settings
-run_step "Applying Firefox settings" apply_firefox_settings
-run_step "Starting yabai and skhd" start_window_services
+if [[ "$#" -eq 0 ]]; then
+  run_step "Installing Homebrew packages and applications" install_homebrew_packages
+  run_step "Installing JetBrainsMono Nerd Font" install_font
+  run_step "Installing Zed and its configuration" install_zed
+  run_step "Installing Zsh configuration" install_zsh_config
+  run_step "Installing Ghostty configuration" install_ghostty_config
+  run_step "Installing skhd configuration" install_skhd_config
+  run_step "Installing yabai configuration" install_yabai_config
+  run_step "Installing the no-sleep-speaker LaunchAgent" install_no_sleep_speaker
+  run_step "Applying macOS settings" apply_macos_settings
+  run_step "Applying Firefox settings" apply_firefox_settings
+  run_step "Starting yabai and skhd" start_window_services
+else
+  for component in "$@"; do
+    case "$component" in
+      homebrew)
+        run_step "Installing Homebrew packages and applications" install_homebrew_packages
+        ;;
+      jetbrains-font)
+        run_step "Installing JetBrainsMono Nerd Font" install_font
+        ;;
+      zed)
+        run_step "Installing Zed and its configuration" bash "$DOTFILES_DIR/zed/install.sh"
+        ;;
+      zsh)
+        run_step "Installing Zsh configuration" install_zsh_config
+        ;;
+      ghostty)
+        run_step "Installing Ghostty configuration" install_ghostty_config
+        ;;
+      skhd)
+        run_step "Installing skhd configuration" install_skhd_config
+        start_window_services skhd
+        ;;
+      yabai)
+        run_step "Installing yabai configuration" install_yabai_config
+        start_window_services yabai
+        ;;
+      no-sleep-speaker)
+        run_step "Installing the no-sleep-speaker LaunchAgent" install_no_sleep_speaker
+        ;;
+      macos-settings)
+        run_step "Applying macOS settings" apply_macos_settings
+        ;;
+      firefox-settings)
+        run_step "Applying Firefox settings" apply_firefox_settings
+        ;;
+    esac
+  done
+fi
 
 info "Installation complete"
 printf '%s\n' \
