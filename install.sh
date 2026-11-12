@@ -2,7 +2,7 @@
 set -euo pipefail
 
 DOTFILES_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip"
+source "$DOTFILES_DIR/scripts/install-common.sh"
 
 info() {
   printf '\n==> %s\n' "$1"
@@ -40,56 +40,9 @@ install_file() {
   printf 'Installed %s\n' "$target"
 }
 
-load_homebrew() {
-  if command -v brew >/dev/null 2>&1; then
-    return
-  fi
-
-  if [[ -x /opt/homebrew/bin/brew ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-    return
-  fi
-
-  if [[ -x /usr/local/bin/brew ]]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-    return
-  fi
-
-  info "Installing Homebrew"
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-  if [[ -x /opt/homebrew/bin/brew ]]; then
-    eval "$(/opt/homebrew/bin/brew shellenv)"
-  elif [[ -x /usr/local/bin/brew ]]; then
-    eval "$(/usr/local/bin/brew shellenv)"
-  else
-    printf 'Homebrew was installed but could not be found.\n' >&2
-    exit 1
-  fi
-}
-
 install_homebrew_packages() {
   load_homebrew
   brew bundle --file "$DOTFILES_DIR/brew.sh"
-}
-
-install_font() {
-  local font_dir="$HOME/Library/Fonts"
-
-  mkdir -p "$font_dir"
-  if [[ -n "$(find "$font_dir" -maxdepth 1 -iname 'JetBrainsMono*NerdFont*' -print -quit)" ]]; then
-    printf 'JetBrainsMono Nerd Font is already installed.\n'
-    return
-  fi
-
-  local temp_dir
-  temp_dir="$(mktemp -d)"
-  curl -fsSL "$FONT_URL" -o "$temp_dir/JetBrainsMono.zip"
-  unzip -q "$temp_dir/JetBrainsMono.zip" -d "$temp_dir/JetBrainsMono"
-  find "$temp_dir/JetBrainsMono" -type f \
-    \( -name '*.ttf' -o -name '*.otf' \) \
-    -exec cp -f {} "$font_dir" \;
-  rm -rf "$temp_dir"
 }
 
 install_no_sleep_speaker() {
@@ -154,6 +107,10 @@ install_yabai_config() {
   install_file "$DOTFILES_DIR/yabairc" "$HOME/.config/yabai/yabairc"
 }
 
+install_zed() {
+  bash "$DOTFILES_DIR/zed/install.sh" --skip-dependencies
+}
+
 apply_macos_settings() {
   bash "$DOTFILES_DIR/.macos"
 }
@@ -172,6 +129,7 @@ fi
 
 run_step "Installing Homebrew packages and applications" install_homebrew_packages
 run_step "Installing JetBrainsMono Nerd Font" install_font
+run_step "Installing Zed and its configuration" install_zed
 run_step "Installing Zsh configuration" install_zsh_config
 run_step "Installing Ghostty configuration" install_ghostty_config
 run_step "Installing skhd configuration" install_skhd_config

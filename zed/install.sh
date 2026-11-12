@@ -9,44 +9,30 @@ fi
 ZED_SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ZED_SETTINGS_SOURCE="$ZED_SCRIPT_DIR/settings.json"
 ZED_SETTINGS_TARGET="$HOME/.config/zed/settings.json"
-ZED_FONT_FILE="$HOME/Library/Fonts/JetBrainsMonoNerdFont-Regular.ttf"
+source "$ZED_SCRIPT_DIR/../scripts/install-common.sh"
+
+case "${1:-}" in
+  "")
+    load_homebrew
+    install_font
+    ;;
+  --skip-dependencies)
+    ;;
+  *)
+    printf 'Usage: %s [--skip-dependencies]\n' "$0" >&2
+    exit 1
+    ;;
+esac
 
 if [[ ! -f "$ZED_SETTINGS_SOURCE" ]]; then
   printf 'Missing settings file: %s\n' "$ZED_SETTINGS_SOURCE" >&2
   exit 1
 fi
 
-if command -v brew >/dev/null 2>&1; then
-  ZED_BREW_BIN="$(command -v brew)"
-elif [[ -x /opt/homebrew/bin/brew ]]; then
-  ZED_BREW_BIN=/opt/homebrew/bin/brew
-elif [[ -x /usr/local/bin/brew ]]; then
-  ZED_BREW_BIN=/usr/local/bin/brew
-else
-  printf 'Installing Homebrew...\n'
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  if [[ -x /opt/homebrew/bin/brew ]]; then
-    ZED_BREW_BIN=/opt/homebrew/bin/brew
-  elif [[ -x /usr/local/bin/brew ]]; then
-    ZED_BREW_BIN=/usr/local/bin/brew
-  else
-    printf 'Homebrew installation finished, but brew was not found.\n' >&2
-    exit 1
-  fi
-fi
-
-eval "$("$ZED_BREW_BIN" shellenv)"
-
-if [[ -d /Applications/Zed.app ]] || "$ZED_BREW_BIN" list --cask zed >/dev/null 2>&1; then
+if [[ -d /Applications/Zed.app ]] || brew list --cask zed >/dev/null 2>&1; then
   printf 'Zed is already installed.\n'
 else
-  "$ZED_BREW_BIN" install --cask zed
-fi
-
-if [[ -f "$ZED_FONT_FILE" ]]; then
-  printf 'JetBrainsMono Nerd Font is already installed.\n'
-else
-  "$ZED_BREW_BIN" install --cask font-jetbrains-mono-nerd-font
+  brew install --cask zed
 fi
 
 install_config_file() {
